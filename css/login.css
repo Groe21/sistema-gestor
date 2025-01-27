@@ -1,0 +1,9 @@
+.btn-show-pass {
+    border: none;
+    background: transparent;
+    color: #555;
+    cursor: pointer;
+  }
+  .btn-show-pass .icon {
+    transition: all .3s;
+  }
