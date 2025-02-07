@@ -2,14 +2,30 @@
 include_once(__DIR__ . '/../config/config.php');
 include_once(__DIR__ . '/../config/conexion.php');
 
+// Verificar autenticación
 if (!isset($_SESSION['usuario'])) {
     header('Location: ' . BASE_URL . '/login.php');
     exit();
 }
 
-// Función para cerrar sesión
-if (isset($_GET['logout'])) {
+// Cerrar sesión de forma segura
+if (isset($_POST['logout'])) {
+    // Validar token CSRF (agregar este token en el formulario de logout)
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die("Acceso no autorizado");
+    }
+
+    // Limpiar y destruir sesión
+    $_SESSION = [];
     session_destroy();
+    setcookie(session_name(), '', time() - 3600, '/');
+
+    // Headers anti-caché
+    header("Cache-Control: no-cache, no-store, must-revalidate");
+    header("Pragma: no-cache");
+    header("Expires: 0");
+
+    // Redirección
     header('Location: ' . BASE_URL . '/login.php');
     exit();
 }
@@ -41,13 +57,13 @@ $pdo = conectarBaseDeDatos();
             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                    <?php
-                    if (isset($_SESSION['usuario']['nombres'])) {
-                        echo $_SESSION['usuario']['nombres'];
+                <?php
+                    if (isset($_SESSION['usuario']['username'])) {
+                        echo htmlspecialchars($_SESSION['usuario']['username']); // Mostrar el nombre de usuario
                     } else {
-                        echo $_SESSION['usuario']['cedula']; // Mostrar la cédula si no hay nombres
+                        echo "Invitado"; // Mensaje por defecto si no hay sesión activa
                     }
-                    ?>
+                ?>
                 </span>
                 <img class="img-profile rounded-circle" src="<?php echo BASE_URL; ?>/img/undraw_profile.svg">
             </a>
@@ -170,30 +186,30 @@ $pdo = conectarBaseDeDatos();
     </div>
 </div>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('#crearPeriodoModal form');
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();
-        
-        const formData = new FormData(form);
-        fetch(form.action, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.text())
-        .then(data => {
-            $('#crearPeriodoModal').modal('hide'); // Oculta el modal de creación
-            if (data.includes('Periodo insertado correctamente')) {
-                $('#successModal').modal('show'); // Muestra el modal de éxito
-            } else {
-                $('#errorModal').modal('show'); // Muestra el modal de error
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            $('#crearPeriodoModal').modal('hide');
-            $('#errorModal').modal('show'); // Muestra el modal de error en caso de fallo
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('#crearPeriodoModal form');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                $('#crearPeriodoModal').modal('hide'); // Oculta el modal de creación
+                if (data.includes('Periodo insertado correctamente')) {
+                    $('#successModal').modal('show'); // Muestra el modal de éxito
+                } else {
+                    $('#errorModal').modal('show'); // Muestra el modal de error
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                $('#crearPeriodoModal').modal('hide');
+                $('#errorModal').modal('show'); // Muestra el modal de error en caso de fallo
+            });
         });
     });
-});
 </script>

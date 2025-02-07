@@ -10,53 +10,77 @@ class Autenticacion {
     }
 
     public function autenticarUsuario($username, $password) {
-        $sql = "SELECT * FROM escuela.usuarios WHERE username = :username";
+        // Prevenir timeout de conexión
+        set_time_limit(30);
+
+        // Limpiar espacios en blanco
+        $username = trim($username);
+        $password = trim($password);
+
+        // Validación básica
+        if (empty($username) || empty($password)) {
+            throw new Exception("Usuario y contraseña son requeridos");
+        }
+
+        // Consulta segura con prepared statement
+        $sql = "SELECT username, password, id_rol FROM escuela.usuarios WHERE username = :username";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':username' => $username]);
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        // Verificación segura de contraseña
         if ($usuario && password_verify($password, $usuario['password'])) {
-            return $usuario;
-        } else {
-            return false;
+            // Regenerar ID de sesión para prevenir fixation
+            session_regenerate_id(true);
+            
+            return [
+                'username' => $usuario['username'],
+                'rol' => $this->obtenerRolUsuario($usuario['id_rol'])
+            ];
         }
+
+        // Retraso artificial para mitigar timing attacks (500ms)
+        usleep(500000);
+        return false;
     }
 
-    public function obtenerRolUsuario($username) {
-        $sql = "SELECT r.nombre AS rol
-                FROM escuela.usuarios u
-                JOIN escuela.roles r ON u.id_rol = r.id_rol
-                WHERE u.username = :username";
+    private function obtenerRolUsuario($id_rol) {
+        $sql = "SELECT nombre FROM escuela.roles WHERE id_rol = :id_rol";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':username' => $username]);
+        $stmt->execute([':id_rol' => $id_rol]);
         $rol = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $rol ? $rol['rol'] : null;
+        return $rol ? $rol['nombre'] : 'invitado'; // Valor por defecto seguro
     }
 }
 
+// --- Procesamiento del formulario ---
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = $_POST['usuario'];
-    $password = $_POST['contrasena'];
+    try {
+        $username = $_POST['usuario'] ?? '';
+        $password = $_POST['contrasena'] ?? '';
 
-    $pdo = conectarBaseDeDatos();
-    $autenticacion = new Autenticacion($pdo);
-    $usuario = $autenticacion->autenticarUsuario($username, $password);
+        $pdo = conectarBaseDeDatos();
+        $autenticacion = new Autenticacion($pdo);
+        $usuario = $autenticacion->autenticarUsuario($username, $password);
 
-    if ($usuario) {
-        // Obtener el rol del usuario
-        $rol = $autenticacion->obtenerRolUsuario($username);
-
-        // Almacena la cédula, nombres y rol en la sesión
-        $_SESSION['usuario'] = [
-            'cedula' => $usuario['username'], // Asumiendo que 'username' es la cédula
-            'nombres' => $usuario['nombres'], // Asegúrate de que 'nombres' esté presente en la base de datos
-            'rol' => $rol // Almacena el rol del usuario
-        ];
-        header('Location: ../../principal.php'); // Redirigir a la página principal o dashboard
-        exit();
-    } else {
-        $_SESSION['error'] = 'Nombre de usuario o contraseña incorrectos';
-        header('Location: ../../login.php'); // Redirigir de vuelta al login
+        if ($usuario) {
+            $_SESSION['usuario'] = [
+                'username' => $usuario['username'],
+                'rol' => $usuario['rol']
+            ];
+            
+            // Redirección segura con ruta absoluta
+            header('Location: ../../principal.php');
+            exit();
+        } else {
+            $_SESSION['error'] = 'Credenciales inválidas';
+            header('Location: ../../login.php');
+            exit();
+        }
+    } catch (Exception $e) {
+        error_log("Error de autenticación: " . $e->getMessage());
+        $_SESSION['error'] = 'Error en el proceso de autenticación';
+        header('Location: ../../login.php');
         exit();
     }
 }

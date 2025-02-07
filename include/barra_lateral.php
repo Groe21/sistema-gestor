@@ -23,6 +23,16 @@ $rol = isset($_SESSION['usuario']['rol']) ? $_SESSION['usuario']['rol'] : null;
     <!-- Divisor -->
     <hr class="sidebar-divider">
 
+    <li class="nav-item">
+        <a class="nav-link" href="<?php echo BASE_URL; ?>">
+            <i class="fas fa-home"></i>
+            <span>Página Principal</span>
+        </a>
+    </li>
+
+    <!-- Divisor -->
+    <hr class="sidebar-divider">
+
     <!-- Elemento de navegación - Inicio -->
     <li class="nav-item">
         <a class="nav-link" href="<?php echo BASE_URL; ?>/principal.php">
