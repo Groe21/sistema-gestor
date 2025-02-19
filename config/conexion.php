@@ -4,8 +4,8 @@ function conectarBaseDeDatos()
     $host = 'localhost';
     $port = '5432'; 
     $dbname = 'aguilas_del_saber'; // Nombre de la base de datos PostgreSQL
-    $user = 'JavierSalinas'; // Nombre de usuario de PostgreSQL
-    $password = 'admin'; // Contraseña de PostgreSQL
+    $user = 'emilio'; // Nombre de usuario de PostgreSQL
+    $password = 'tkmch2005'; // Contraseña de PostgreSQL
 
     
     try {
