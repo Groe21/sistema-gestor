@@ -36,7 +36,7 @@ class Usuario {
                                         </thead>
                                         <tbody>';
         foreach ($usuarios as $usuario) {
-            $passwordMasked = str_repeat('*', strlen($usuario['password'])); // Reemplazar la contraseña con asteriscos
+            $passwordMasked = str_repeat('👻', strlen($usuario['password'])); // Reemplazar la contraseña con asteriscos
             echo '<tr>
                     <td>' . htmlspecialchars($usuario['username']) . '</td>
                     <td>' . htmlspecialchars($passwordMasked) . '</td>
