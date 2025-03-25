@@ -34,10 +34,11 @@ $usuario = new Usuario($pdo);
     <!-- DataTables CSS -->
     <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-
-
 </head>
 
 <body id="page-top">
@@ -95,26 +96,57 @@ $usuario = new Usuario($pdo);
         </div>
         <!-- Fin del contenedor de la página -->
 
-    <!-- Modal de Confirmación de Eliminación -->
-<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        ¿Estás seguro de que deseas eliminar este usuario?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-danger" id="confirmDelete">Eliminar</button>
-      </div>
+    <!-- Modal para editar usuario -->
+    <div class="modal fade" id="editarUsuarioModal" tabindex="-1" aria-labelledby="editarUsuarioModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarUsuarioModalLabel">Editar Usuario</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editarUsuarioForm">
+                        <input type="hidden" id="editUserId" name="id_usuario">
+                        <div class="mb-3">
+                            <label for="editUsername" class="form-label">Nombre de Usuario</label>
+                            <input type="text" class="form-control" id="editUsername" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPassword" class="form-label">Nueva Contraseña (dejar en blanco para mantener la actual)</label>
+                            <input type="password" class="form-control" id="editPassword" name="password">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="guardarEdicion">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
+
+    <!-- Modal de Confirmación de Eliminación -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            ¿Estás seguro de que deseas eliminar este usuario?
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-danger" id="confirmDelete">Eliminar</button>
+        </div>
+        </div>
+    </div>
+    </div>
 
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
@@ -194,6 +226,66 @@ $usuario = new Usuario($pdo);
     });
 </script>
 
+<script>
+    $(document).ready(function() {
+        // Manejar el clic en el botón de editar
+        $('.btn-edit').on('click', function() {
+            const userId = $(this).data('user-id');
+            const username = $(this).data('username');
+            
+            $('#editUserId').val(userId);
+            $('#editUsername').val(username);
+            $('#editPassword').val('');
+            
+            $('#editarUsuarioModal').modal('show');
+        });
+
+        // Manejar el envío del formulario de edición
+        $('#guardarEdicion').on('click', function() {
+            const formData = new FormData($('#editarUsuarioForm')[0]);
+            
+            $.ajax({
+                url: '<?php echo BASE_URL; ?>/models/usuarios/editar_usuario.php',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        $('#editarUsuarioModal').modal('hide');
+                        Swal.fire({
+                            title: '¡Éxito!',
+                            text: 'Usuario actualizado correctamente',
+                            icon: 'success',
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: response.error || 'Error al actualizar el usuario',
+                            icon: 'error',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Error al procesar la solicitud',
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            });
+        });
+    });
+</script>
+
 </body>
 
 </html>
+

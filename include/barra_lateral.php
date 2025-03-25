@@ -20,12 +20,9 @@ $rol = isset($_SESSION['usuario']['rol']) ? $_SESSION['usuario']['rol'] : null;
         </div>
     </a>
 
-    <!-- Divisor -->
-    <hr class="sidebar-divider">
-
     <li class="nav-item">
-        <a class="nav-link" href="<?php echo BASE_URL; ?>">
-            <i class="fas fa-home"></i>
+        <a class="nav-link text-center d-flex justify-content-center align-items-center" href="<?php echo BASE_URL; ?>">
+            <i class="fas fa-home me-2"></i>
             <span>Página Principal</span>
         </a>
     </li>
@@ -36,7 +33,7 @@ $rol = isset($_SESSION['usuario']['rol']) ? $_SESSION['usuario']['rol'] : null;
     <!-- Elemento de navegación - Inicio -->
     <li class="nav-item">
         <a class="nav-link" href="<?php echo BASE_URL; ?>/principal.php">
-            <i class="fas fa-home"></i>
+            <i class="fas fa-tachometer-alt"></i>
             <span>Inicio</span>
         </a>
     </li>

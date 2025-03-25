@@ -36,15 +36,21 @@ class Usuario {
                                         </thead>
                                         <tbody>';
         foreach ($usuarios as $usuario) {
-            $passwordMasked = str_repeat('👻', strlen($usuario['password'])); // Reemplazar la contraseña con asteriscos
+            $passwordMasked = str_repeat('👻', ceil(strlen($usuario['password']) / 2));
             echo '<tr>
                     <td>' . htmlspecialchars($usuario['username']) . '</td>
                     <td>' . htmlspecialchars($passwordMasked) . '</td>
                     <td>
+                        <button class="btn btn-warning btn-sm btn-edit me-2" title="Editar" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#editarUsuarioModal" 
+                                data-user-id="' . $usuario['id_usuario'] . '" 
+                                data-username="' . htmlspecialchars($usuario['username']) . '">
+                            <i class="fas fa-edit"></i>
+                        </button>
                         <button class="btn btn-danger btn-sm btn-delete" title="Eliminar" data-user-id="' . $usuario['id_usuario'] . '">
                             <i class="fas fa-trash-alt"></i>
                         </button>
-                        
                     </td>
                   </tr>';
         }

@@ -1,0 +1,37 @@
+.sidebar {
+    box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+}
+
+.nav-item .nav-link {
+    transition: all 0.3s ease;
+    border-radius: 5px;
+    margin: 0 1rem;
+}
+
+.nav-item .nav-link:hover {
+    background-color: rgba(255,255,255,0.1);
+    transform: translateX(5px);
+}
+
+.collapse-inner {
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.collapse-item {
+    transition: all 0.3s ease;
+    border-radius: 5px;
+    margin: 2px 0;
+}
+
+.collapse-item:hover {
+    background-color: #f8f9fc;
+    transform: translateX(5px);
+}
+
+.sidebar-heading {
+    letter-spacing: 1px;
+    font-weight: 600;
+    padding: 1rem;
+    color: rgba(255,255,255,0.8);
+}

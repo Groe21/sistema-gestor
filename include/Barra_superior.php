@@ -60,8 +60,6 @@ $pdo = conectarBaseDeDatos();
                 <?php
                     if (isset($_SESSION['usuario']['username'])) {
                         echo htmlspecialchars($_SESSION['usuario']['username']); // Mostrar el nombre de usuario
-                    } else {
-                        echo "Invitado"; // Mensaje por defecto si no hay sesión activa
                     }
                 ?>
                 </span>
