@@ -92,6 +92,25 @@ $rol = isset($_SESSION['usuario']['rol']) ? $_SESSION['usuario']['rol'] : null;
 
         <!-- Divisor -->
         <hr class="sidebar-divider">
+
+        <!-- Dropdown - Juegos -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseJuegos"
+                aria-expanded="true" aria-controls="collapseJuegos">
+                <i class="fas fa-gamepad"></i>
+                <span>Juegos</span>
+            </a>
+            <div id="collapseJuegos" class="collapse" aria-labelledby="headingJuegos" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <h6 class="collapse-header">Lista de Juegos:</h6>
+                    <a class="collapse-item" href="<?php echo BASE_URL; ?>/views/juegos/bricks_ball.php">Bricks Ball</a>
+                    <a class="collapse-item" href="<?php echo BASE_URL; ?>/views/juegos/hand_gestures.php">Hand Gestures</a>
+                </div>
+            </div>
+        </li>
+
+        <!-- Divisor -->
+        <hr class="sidebar-divider">
     <?php elseif ($rol == 'profesor') : ?>
         <!-- Encabezado -->
         <div class="sidebar-heading">
